@@ -1,12 +1,16 @@
 ;(function (undefined) {
     var doc = document,
         EVENTS = doc.documentElement,
+        timers = {},
         criticalAlert,
         ammoCounter,
         timeCounter,
         tempGraph,
         rmGraph,
-        oldObj;
+        oldObj,
+        main,
+        tmpl;
+
 
     // Lightweight CSS selector
     var q$ = function (selector, context) {
@@ -17,11 +21,21 @@
     };
 
 
+    // Build UI
+    main = q$('main')[0];
+    tmpl = q$('#template_cp')[0].innerHTML;
+
+    ['backFace', 'frontFace'].forEach(function (className) {
+        main.innerHTML += tmpl.replace('${class}', className);
+    });
+
+
+    // Cache elements
+    criticalAlert = q$('.frontFace .alert');
     tempGraph = q$('.meter.temp .meterBar');
     rmGraph = q$('.meter.rm .meterBar');
     ammoCounter = q$('.ammo .counter');
     timeCounter = q$('.time .counter');
-    criticalAlert = q$('.alert');
 
 
     // Update all the things
@@ -34,23 +48,25 @@
 
     // Change a value of a counter
     var updateCounter = function (arr, key, val) {
-        var start = Date.now(),
-            oldVal,
-            tmr;
+        var curVal;
+
+        clearTimeout(timers[key]);
 
         if (!oldObj) {
+            updateEls(arr, val);
             return;
         }
 
-        oldVal = oldObj[key]
+        curVal = parseInt(oldObj[key], 10);
 
-        tmr = setInterval(function () {
-            updateEls(arr, val);
+        timers[key] = setInterval(function () {
+            updateEls(arr, curVal);
+            curVal--;
 
-            if ((Date.now() - start) > 500) {
-                clearInterval(tmr);
+            if (curVal < val || curVal === 0) {
+                clearInterval(timers[key]);
             }
-        }, 30);
+        }, 40);
     };
 
 
@@ -60,27 +76,47 @@
     });
 
 
-    // Temp graph
+    // Graph
     EVENTS.addTrigger('temp', function (obj) {
+        var rm = Math.floor(Math.random() * (54 + 1));
+
+        // Update temp graph
         tempGraph.forEach(function (el) {
             el.style.height = ((parseInt(obj.temp, 10) * 84) / 100) + '%';
+        });
+
+        //Periodically stall RM graph
+        if (parseInt(obj.temp, 10) === 0) {
+            rm = 0;
+        } else if (rm % 2 === 0) {
+            return;
+        }
+
+        // Update RM graph
+        rmGraph.forEach(function (el) {
+            el.style.height = rm + '%';
         });
     });
 
 
     // Ammo situation critical
     EVENTS.addTrigger('critical', function (obj) {
-        criticalAlert[0].classList.add('active');
+        if (criticalAlert[0].classList.contains('depleted')) {
+            return;
+        }
+        criticalAlert[0].classList.add('active')
+        criticalAlert[0].classList.toggle('flash');
     });
 
 
     // Ammo situation critical
     EVENTS.addTrigger('depleted', function (obj) {
+        criticalAlert[0].classList.remove('flash');
         criticalAlert[0].classList.add('depleted');
     });
 
 
-    // Temp
+    // Temp - this will be a SSE stream
     if (window.mock) {
         mock.forEach(function (obj, index) {
             setTimeout(function () {
@@ -89,7 +125,7 @@
                 });
 
                 oldObj = obj;
-            }, index * 500);
+            }, index * 250);
         });
     }
 } ());

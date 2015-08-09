@@ -190,7 +190,6 @@ h3{
 main{
     height:33.3333333vh;
     padding:20px;
-    transform(scale(4,4));
     width:33.333333vh
 }
 
@@ -353,10 +352,12 @@ main{
 .cp .counterBlock.time{
     top:390px
 }
-
 .cp .alert{
+    display:none
+}
+.cp.frontFace .alert{
     border:6px yellow solid;
-    bottom:194px;
+    bottom:196px;
     display:none;
     font-size:3rem;
     left:42px;
@@ -365,22 +366,28 @@ main{
     width:280px;
     text-align:center
 }
-.cp .alert.active{
-    border:6px transparent solid;
+.cp.frontFace .alert.active{
     display:block
 }
-.cp .alert > strong{
+.cp.frontFace .alert.active.flash{
+    -webkit-animation-name:flash;
+    animation-name:flash;
+    border:6px transparent solid
+}
+.cp.frontFace .alert > strong{
     display:block;
     padding:20px
 }
-.cp .alert.active > strong{
+.cp.frontFace .alert.active > strong{
     background:yellow;
     color:#000
 }
-.cp .alert.active.depleted{
+.cp.frontFace .alert.active.depleted{
+    -webkit-animation-name:none;
+    animation-name:none;
     background:yellow
 }
-.cp .alert.active.depleted strong{
+.cp.frontFace .alert.active.depleted strong{
     opacity:.8
 }
 
@@ -392,7 +399,43 @@ main{
     transition:.325s
 }
 .cp .meter .meterBar{
-    -webkit-transition:height .5s;
-    -moz-transition:height .5s;
-    transition:height .5s
+    -webkit-transition:height .8s;
+    -moz-transition:height .8s;
+    transition:height .8s
+}
+@-webkit-keyframes flash{
+    0%, 100%{
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+
+    10%, 30%, 50%, 70%, 90%{
+        -webkit-transform: translate3d(-10px, 0, 0);
+        transform: translate3d(-10px, 0, 0);
+    }
+
+    20%, 40%, 60%, 80%{
+        -webkit-transform: translate3d(10px, 0, 0);
+        transform: translate3d(10px, 0, 0);
+    }
+}
+
+@keyframes flash{
+    0%, 100%{
+        -webkit-transform: translate3d(0, 0, 0);
+        -ms-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+
+    10%, 30%, 50%, 70%, 90%{
+        -webkit-transform: translate3d(-10px, 0, 0);
+        -ms-transform: translate3d(-10px, 0, 0);
+        transform: translate3d(-10px, 0, 0);
+    }
+
+    20%, 40%, 60%, 80%{
+        -webkit-transform: translate3d(10px, 0, 0);
+        -ms-transform: translate3d(10px, 0, 0);
+        transform: translate3d(10px, 0, 0);
+    }
 }
