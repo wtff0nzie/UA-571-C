@@ -1,10 +1,10 @@
 /***************************************************
- *                      Engine
- ****************************************************
- *
- *   About:  App core
- *
- ****************************************************/
+*   Bootstrap the app (without the confusion)
+****************************************************
+*
+*   About:  Build the app from libs and components
+*
+****************************************************/
 var mongo = require('mongojs'),
     DBcreds = process.env.DB,
     fs = require('fs');
@@ -47,20 +47,21 @@ traverseFileSystem('./app/components/', function (currentFile) {
 
 // Optional DB
 if (DBcreds) {
-    DB = {};
-    DBcollection = [];
     objectId = mongo.ObjectId;
-
+    DBcollection = [];
 
     // Ask components for their DB requirements
     EVENTS.emit('DBsetup');
-
 
     // Spin up DB
     setTimeout(function () {
         DB = mongo.connect(DBcreds, DBcollection);
         EVENTS.emit('DBReady');
     }, 222);
+} else {
+    setTimeout(function () {
+        EVENTS.emit('DBReady');
+    }, 999);
 }
 
 

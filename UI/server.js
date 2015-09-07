@@ -7,7 +7,7 @@ EVENTS = new eventEmitter.EventEmitter();
 
 
 // Import
-require('./app/engine.js');
+require('./app/startup.js');
 
 
 // Listen for HTTP requests
